@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Modify user</title>
+</head>
+<body>
+<div style="float: right">
+    <a th:href="@{'/logout'}">Logout</a>
+</div>
+<form th:method="POST" th:action="@{/admin/createOrEditUser}" th:object="${user}"
+      style="position: absolute; left: 40%; top: 20%;">
+    <div style="margin: 0 0 50px 80px;
+    font-weight: bold;
+    font-size: 20px;">
+        Enter user details
+    </div>
+    <input type="hidden" th:field="*{id}" id="id">
+    <input type="hidden" th:field="*{password}" id="password">
+    <label for="name">Enter name: </label>
+    <input type="text" th:field="*{name}" id="name"/>
+    <br>
+    <br>
+    <label for="surname">Enter surname: </label>
+    <input type="text" th:field="*{surname}" id="surname"/>
+    <br>
+    <br>
+    <label for="email">Enter email: </label>
+    <input type="text" th:field="*{email}" id="email"/>
+    <br>
+    <br>
+    <label for="age">Enter age: </label>
+    <input type="text" th:field="*{age}" id="age"/>
+    <br>
+    <br>
+    <br>
+    <br>
+    <label for="username">Enter username: </label>
+    <input type="text" th:field="*{username}" id="username"/>
+    <br>
+    <br>
+    <label for="passwordInput">Enter password: </label>
+    <input th:type="password" value="a7eUqmEr=WvKfYcWA@?k7)?08=*mVYah8)FYz+hohuMBt]zZGusQs^h^7dt6KehG9yC_kr6Z_qkHTUn>"
+           th:name="passwordInput" id="passwordInput"/>
+    <br>
+    <br>
+    <p>
+        <label>Roles:
+            <input type="checkbox" name="roles"
+                   th:checked="${user.getRoles().contains(role)}"
+                   th:each="role : ${rolesList}"
+                   th:text="${role.getRoleName()}"
+                   th:value="${role.getId()}"
+                   th:field="*{roles}"
+            />
+        </label>
+    </p>
+    <br>
+    <br>
+    <input type="submit" value="Modify!"/>
+</form>
+
+</body>
+</html>
