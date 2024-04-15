@@ -1,48 +1,68 @@
 package ru.kata.spring.boot_security.demo.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kata.spring.boot_security.demo.dao.UserDAO;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.repositories.UsersRepository;
+
 import java.util.List;
 
 
 @Service
-@Transactional
-public class UserServiceImpl implements UserService {
-    private final UsersRepository usersRepository;
-    private final PasswordEncoder passwordEncoder;
+@Transactional(readOnly = true)
+public class UserServiceImpl implements UserService, UserDetailsService {
+    private final UserDAO userDAO;
 
-    public UserServiceImpl(UsersRepository usersRepository, PasswordEncoder passwordEncoder) {
-        this.usersRepository = usersRepository;
-        this.passwordEncoder = passwordEncoder;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+
+    public UserServiceImpl(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     @Override
-    public void addOrEditUser(User user) {
-        if (user.getId() == 0 || !getUserById(user.getId()).getPassword().equals(user.getPassword())) {
+    @Transactional
+    public void addUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDAO.addUser(user);
+    }
+
+    @Override
+    @Transactional
+    public void editUser(User user) {
+        if (!getUserById(user.getId()).getPassword().equals(user.getPassword())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-
-        usersRepository.save(user);
+        userDAO.editUser(user);
     }
 
     @Override
+    @Transactional
     public void deleteUser(int id) {
         if (getUserById(id) == null) {
             throw new NullPointerException();
         }
-        usersRepository.deleteById(id);
+        userDAO.deleteUser(id);
     }
 
     @Override
     public List<User> listUsers() {
-        return usersRepository.findAll();
+        return userDAO.listUsers();
     }
 
     @Override
     public User getUserById(int id) {
-        return usersRepository.getById(id);
+        return userDAO.getUserById(id);
     }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userDAO.findByUsername(username);
+    }
+
 }

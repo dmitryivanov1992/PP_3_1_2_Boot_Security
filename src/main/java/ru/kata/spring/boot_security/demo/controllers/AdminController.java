@@ -8,7 +8,9 @@ import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import java.util.Arrays;
+import javax.management.relation.RoleNotFoundException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/admin")
@@ -46,18 +48,25 @@ public class AdminController {
         return "admin/new";
     }
 
-    @PostMapping("/createOrEditUser")
-    public String createOrEditUser(@ModelAttribute("user") User user,
-                                   @RequestParam(value = "roles", required = false) Role[] roles,
-                                   @RequestParam(value = "passwordInput", required = false) String password) {
-        if (roles != null) {
-            Arrays.stream(roles).forEach(user::setRole);
-        }
-        if (password != null && !password.equals("a7eUqmEr=WvKfYcWA@?k7)?08=*mVYah8)FYz+hohuMBt]zZGusQs^h^7dt6KehG9yC_kr6Z_qkHTUn>")) {
-            user.setPassword(password);
-        }
-        userService.addOrEditUser(user);
+    @PostMapping("/new")
+    public String createUser(@ModelAttribute("user") User user) {
+        userService.addUser(user);
         return "redirect:/admin";
     }
+
+    @PostMapping("/edit")
+    public String editUser(@ModelAttribute("user") User user,
+                           @RequestParam(value = "roleAdmin", required = false) boolean roleAdmin,
+                           @RequestParam(value = "roleUser", required = false) boolean roleUser) {
+        Set<Role> roleSet = new HashSet<>();
+        try{
+            if (roleAdmin) roleSet.add(roleService.findRoleByName("ROLE_ADMIN"));
+            if (roleUser) roleSet.add(roleService.findRoleByName("ROLE_USER"));
+        } catch (RoleNotFoundException e) {}
+        user.setRoles(roleSet);
+        userService.editUser(user);
+        return "redirect:/admin";
+    }
+
 
 }
