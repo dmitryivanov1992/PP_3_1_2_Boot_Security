@@ -6,7 +6,9 @@
 </head>
 <body>
 <div style="float: right">
-    <a th:href="@{'/logout'}">Logout</a>
+    <a th:href="@{'/logout'}">
+        <input type="button" value="Logout">
+    </a>
 </div>
 <form th:method="POST" th:action="@{/admin/edit}" th:object="${user}"
       style="position: absolute; left: 40%; top: 20%;">
@@ -44,10 +46,17 @@
     <br>
     <p>
         <label>Roles:
-            <input type="checkbox" th:checked="${user.hasRoleByRolename('ROLE_ADMIN')}" name="roleAdmin"> ROLE_ADMIN
-            <input type="checkbox" th:checked="${user.hasRoleByRolename('ROLE_USER')}" name="roleUser"> ROLE_USER
+            <input type="checkbox" name="roles"
+                   th:checked="${user.hasRoleByRolename(role.getRoleName())}"
+                   th:each="role : ${rolesList}"
+                   th:text="${role.getRoleName()}"
+                   th:value="${role.getRoleName()}"
+
+            /><!--                   th:field="*{roles}"-->
         </label>
     </p>
+
+
     <br>
     <br>
     <input type="submit" value="Modify!"/>
@@ -55,3 +64,5 @@
 
 </body>
 </html>
+
+<!--                   th:text="${role.getRoleName()}"-->

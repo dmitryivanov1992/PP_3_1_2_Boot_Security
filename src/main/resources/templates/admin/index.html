@@ -6,7 +6,10 @@
 </head>
 <body>
 <div style="float: right">
-    <a th:href="@{'/logout'}">Logout</a>
+    <a th:href="@{'/logout'}">
+        <input type="button" value="Logout">
+    </a>
+
 </div>
 <div th:each="user:${users}">
     <span th:text="${user.getName()}+'  '+${user.getSurname()}">User</span>
@@ -18,5 +21,6 @@
 <br>
 <br>
 <a href="/admin/new">Create new user</a>
+
 </body>
 </html>

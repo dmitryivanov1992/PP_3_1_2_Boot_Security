@@ -50,23 +50,29 @@ public class AdminController {
 
     @PostMapping("/new")
     public String createUser(@ModelAttribute("user") User user) {
+        if (!user.getRoles().isEmpty()) {
+            user.getRoles().forEach(role -> {
+                try {
+                    role.setId(roleService.findRoleByName(role.getRoleName()).getId());
+                } catch (RoleNotFoundException e) {
+                }
+            });
+        }
         userService.addUser(user);
         return "redirect:/admin";
     }
 
     @PostMapping("/edit")
-    public String editUser(@ModelAttribute("user") User user,
-                           @RequestParam(value = "roleAdmin", required = false) boolean roleAdmin,
-                           @RequestParam(value = "roleUser", required = false) boolean roleUser) {
-        Set<Role> roleSet = new HashSet<>();
-        try{
-            if (roleAdmin) roleSet.add(roleService.findRoleByName("ROLE_ADMIN"));
-            if (roleUser) roleSet.add(roleService.findRoleByName("ROLE_USER"));
-        } catch (RoleNotFoundException e) {}
-        user.setRoles(roleSet);
+    public String editUser(@ModelAttribute("user") User user) {
+        if (!user.getRoles().isEmpty()) {
+            user.getRoles().forEach(role -> {
+                try {
+                    role.setId(roleService.findRoleByName(role.getRoleName()).getId());
+                } catch (RoleNotFoundException e) {
+                }
+            });
+        }
         userService.editUser(user);
         return "redirect:/admin";
     }
-
-
 }
